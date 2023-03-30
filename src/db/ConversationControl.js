@@ -4,6 +4,7 @@ import RecordChat from "./RecordChat.js"
 import AIInterface from "../utils/AIInterface.js"
 import PromptCreator from "../utils/PromptCreator.js";
 import RecordHelper from "../utils/RecordHelper.js";
+import EmbeddedControl from "./EmbeddedControl.js"
 
 class ConversationControl {
     static FindConversation = function (chatid) {
@@ -66,7 +67,14 @@ class ConversationControl {
         var data = await AIInterface.ChatCompletion(messages);
 
         if (data.result == 0) {
-            RecordChat.SaveSummary(chatid, allchat, data.message, topic);
+            var summary = RecordChat.SaveSummary(chatid, allchat, data.message, topic);
+
+            AIInterface.Embedding(data.message).then((result)=>{
+                if (result.result == 0) {
+                    var md5 = EmbeddedControl.AddEmbedded(Fragment, result.message);
+                    console.log("Fragment[" + chatid + "] Embedding finish, md5: " + md5);
+                }
+            })
         }
 
         return data;
@@ -90,7 +98,8 @@ class ConversationControl {
     }
 
     static ProcessQuestion = async function (chatid, input) {
-        var messages = await PromptCreator.CreateQuestionPrompt(input);
+        var allchat = RecordChat.LoadAllChat(chatid);
+        var messages = await PromptCreator.CreateQuestionPrompt(allchat, input);
         if (messages == null) {
             return JSON.parse("{ result:-1, message:\"CreateQuestionPrompt failed\"}");
         }

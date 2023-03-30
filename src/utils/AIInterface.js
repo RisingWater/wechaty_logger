@@ -81,7 +81,6 @@ class AIInterface {
                 data.message = "Question not embedded properly";
             }
         } catch (error) {
-            console.log(error);
             if (error.response) {
                 data.result = error.response.status;
                 data.message = error.response.data;

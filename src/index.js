@@ -7,7 +7,7 @@ import MsgProcess from "./Message/MsgProcess.js";
 
 dotenv.config();
 
-const MessageTypeStr = ["Unknown", "Attachment", "Audio", "Contact", "ChatHistory", "Emoticon", 
+const MessageTypeStr = ["Unknown", "Attachment", "Audio", "Contact", "ChatHistory", "Emoticon",
     "Image", "Text", "Location", "MiniProgram", "GroupNote", "Transfer", "RedEnvelope", "Recalled",
     "Url", "Video", "Post"
 ];

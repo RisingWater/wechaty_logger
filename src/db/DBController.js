@@ -49,7 +49,11 @@ class DBController {
     }
 
     static LoadEmbeddedDB = function () {
-        return LoadDB(db_dir + 'embedded/embedded_data.txt');
+        return LoadDB(db_dir + 'embedded/embedded.js');
+    }
+
+    static SaveEmbeddedDB = function (data) {
+        return SaveDB(db_dir + 'embedded/embedded.js', data);
     }
 }
 

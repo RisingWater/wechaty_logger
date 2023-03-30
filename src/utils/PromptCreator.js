@@ -1,74 +1,39 @@
 import AIInterface from "../utils/AIInterface.js"
-import fs from "fs";
-import DBController from "../db/DBController.js"
+import EmbeddedControl from "../db/EmbeddedControl.js"
 
-const embeds_storage_prefix = "embeds:";
+const MaxPromptSize = 1500;
 
-function keyExtractParagraph(key) {
-    return key.substring(embeds_storage_prefix.length);
-};
-
-function compareEmbeddings(embedding1, embedding2) {
-    var length = Math.min(embedding1.length, embedding2.length);
-    var dotprod = 0;
-
-    for (var i = 0; i < length; i++) {
-        dotprod += embedding1[i] * embedding2[i];
+function GenDialogPrompt(history, current_input) {
+    var messages = [];
+    var total_len = current_input.length;
+    var i = 0;
+    for (i = history.length; i > 0; i--) {
+        total_len += history[i - 1].content.length;
+        if (total_len > MaxPromptSize) {
+            break;
+        }
     }
 
-    return dotprod;
-};
-
-function findClosestParagraphs(questionEmbedding, count) {
-    var items = [];
-
-    var embeddingStore = DBController.LoadEmbeddedDB();
-
-    for (const key in embeddingStore) {
-        var paragraph = keyExtractParagraph(key);
-
-        var currentEmbedding = JSON.parse(embeddingStore[key]).embedding;
-
-        items.push({
-            paragraph: paragraph,
-            score: compareEmbeddings(questionEmbedding, currentEmbedding),
-        });
+    var j = 0;
+    for (j = i; j < history.length; j++) {
+        var tmp = { "role": "", "content": "" };
+        if (history[j].role == 0) {
+            tmp.role = "user";
+        } else {
+            tmp.role = "assistant";
+        }
+        tmp.content = history[j].content;
+        messages.push(tmp);
     }
+    var current = { "role": "user", "content": current_input };
+    messages.push(current);
 
-    items.sort(function (a, b) {
-        return b.score - a.score;
-    });
-
-    return items.slice(0, count).map((item) => item.paragraph);
-};
+    return messages;
+}
 
 class PromptCreator {
     static CreateDialogPrompt = async function (history, current_input) {
-        var messages = [];
-        var total_len = 0;
-        var i = 0;
-        for (i = history.length; i > 0; i--) {
-            total_len += history[i - 1].content.length;
-            if (total_len > 1000) {
-                break;
-            }
-        }
-
-        var j = 0;
-        for (j = i; j < history.length; j++) {
-            var tmp = { "role": "", "content": "" };
-            if (history[j].role == 0) {
-                tmp.role = "user";
-            } else {
-                tmp.role = "assistant";
-            }
-            tmp.content = history[j].content;
-            messages.push(tmp);
-        }
-        var current = { "role": "user", "content": current_input };
-        messages.push(current);
-
-        return messages;
+        return GenDialogPrompt(history, current_input);
     }
 
     static CreateSummaryPrompt = async function (allchat) {
@@ -86,31 +51,23 @@ class PromptCreator {
         return all_prompt;
     }
 
-    static CreateQuestionPrompt = async function (content) {
+    static CreateQuestionPrompt = async function (history, content) {
         var result = await AIInterface.Embedding(content);
 
         if (result.result != 0) {
             return null;
         }
 
-        var closestParagraphs = findClosestParagraphs(result.message, 5);
+        var closestParagraphs = EmbeddedControl.FindClosestFragment(result.message, 5);
 
         var prompt =
-            //"Answer the following question from the context, if the answer can not be deduced from the context, say '我不知道' :" +
-            "Answer the following question, also use your own knowledge when necessary :\n\n" +
-            "Context :\n" +
+            "回答下面的问题, 你可以使用下列资料作为参考\n" +
+            "资料:\n" +
             closestParagraphs.join("\n\n") +
-            "\n\nQuestion :\n" +
-            content +
-            "?" +
-            "\n\nAnswer :"
-            ;
+            "问题如下 :\n" +
+            content;
 
-        var all_prompt = [
-            { "role": "user", "content": prompt }
-        ]
-
-        return all_prompt;
+        return GenDialogPrompt(history, prompt);
     }
 }
 

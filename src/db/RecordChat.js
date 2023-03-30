@@ -29,7 +29,9 @@ class RecordChat {
         const newChat = [];
         DBController.SaveChatDB(uuid(), newChat);
 
-        return DBController.SaveChatSummary(uuid(), data);
+        DBController.SaveChatSummary(uuid(), data);
+
+        return data;
     }
 }
 
