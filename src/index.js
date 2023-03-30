@@ -1,29 +1,15 @@
 import { WechatyBuilder } from "wechaty";
 import dotenv from "dotenv";
 import qrcode from "qrcode-terminal";
-import ConversationControl from "./db/conversation_controller.js"
+import CmdHelper from "./utils/CmdHelper.js"
 import { PuppetXp } from 'wechaty-puppet-xp'
+import MsgProcess from "./Message/MsgProcess.js";
 
 dotenv.config();
 
-const MessageTypeStr = [
-    "Unknown",
-    "Attachment",
-    "Audio",
-    "Contact",
-    "ChatHistory",
-    "Emoticon",
-    "Image",
-    "Text",
-    "Location",
-    "MiniProgram",
-    "GroupNote",
-    "Transfer",
-    "RedEnvelope",
-    "Recalled",
-    "Url",
-    "Video",
-    "Post"
+const MessageTypeStr = ["Unknown", "Attachment", "Audio", "Contact", "ChatHistory", "Emoticon", 
+    "Image", "Text", "Location", "MiniProgram", "GroupNote", "Transfer", "RedEnvelope", "Recalled",
+    "Url", "Video", "Post"
 ];
 
 function onScan(payload) {
@@ -41,7 +27,6 @@ function onLogout(user) {
 }
 
 async function onMessage(message) {
-
     if (message.self()) {
         console.log("Message discarded because its outgoing");
         return;
@@ -86,8 +71,7 @@ async function onMessage(message) {
         msg.topic = "在" + room_topic + "中的对话";
     }
 
-    if (message.payload.type != bot.Message.Type.ChatHistory)
-    {
+    if (message.payload.type != bot.Message.Type.ChatHistory) {
         console.log("recv:" + msg.content + " in: " + msg.topic + " from: " + msg.from + " age:" + message.age());
     } else if (message.payload.type == bot.Message.Type.Text) {
         console.log("recv:" + "聊天记录" + " in: " + msg.topic + " from: " + msg.from + " age:" + message.age());
@@ -96,53 +80,22 @@ async function onMessage(message) {
     var mentionSelf = "@" + message.listener().name();
 
     var commandstr = null;
+
     if (in_room) {
         if (msg.content.startsWith(mentionSelf)) {
             commandstr = msg.content.substring(mentionSelf.length).trim();
         }
     } else {
-        if (msg.content === "开始对话"
-            || msg.content === "结束对话"
-            || msg.content === "开始记录"
-            || msg.content === "结束记录") {
+        if (CmdHelper.isValidCmd(msg.content)) {
             commandstr = msg.content;
         }
     }
 
-    if (commandstr) {
-        if (commandstr == "开始记录") {
-            message.say("已开始记录");
-            ConversationControl.start_conversation(msg.conversationid, "record");
-        } else if (commandstr == "结束记录") {
-            message.say("记录已完成，正在总结:");
-            ConversationControl.summary_recorded_conversation(msg.conversationid, msg.topic).then((result) => {
-                message.say("总结如下:\n" + result.message);
-                ConversationControl.end_conversation(msg.conversationid, "record");
-            })
-        } else if (commandstr == "开始对话") {
-            message.say("已开始对话");
-            ConversationControl.start_conversation(msg.conversationid, "dialog");
-        } else if (commandstr == "结束对话") {
-            ConversationControl.dialog_conversation_end(msg.conversationid);
-            ConversationControl.end_conversation(msg.conversationid, "dialog");
-            message.say("已结束对话, 很高兴可以帮助到你");
-        }
-    } else {
-        var conversation = ConversationControl.find_conversation(msg.conversationid);
-        if (conversation != null) {
-            if (conversation.type == "record") {
-                if (message.payload.type == bot.Message.Type.Text) {
-                    ConversationControl.record_conversation(msg.conversationid, msg.from, msg.content);
-                } else if (message.payload.type == bot.Message.Type.ChatHistory) {
-                    ConversationControl.record_chatlog(msg.conversationid, msg.content);
-                }
-            } else if (conversation.type == "dialog") {
-                ConversationControl.dialog_conversation(msg.conversationid, msg.content).then((result) => {
-                    message.say(result.message);
-                });
-            }
-        }
+    if (commandstr == null) {
+        commandstr = "Default";
     }
+
+    CmdHelper.ProcessCmd(commandstr, msg, message, bot);
 }
 
 var bot = null;
@@ -171,6 +124,13 @@ if (process.env.WECHATY_PUPPET == "wechaty-puppet-wechat") {
     bot = tmp;
 }
 
+CmdHelper.registerCmd("开始对话", MsgProcess.StartDialogProcess);
+CmdHelper.registerCmd("结束对话", MsgProcess.EndDialogProcess);
+CmdHelper.registerCmd("开始记录", MsgProcess.StartRecordProcess);
+CmdHelper.registerCmd("结束记录", MsgProcess.EndRecordProcess);
+CmdHelper.registerCmd("开始提问", MsgProcess.StartQuestionProcess);
+CmdHelper.registerCmd("结束提问", MsgProcess.EndQuestionProcess);
+CmdHelper.registerCmd("Default", MsgProcess.ProcessDefault);
 
 bot.on('scan', onScan)
 bot.on('login', onLogin)

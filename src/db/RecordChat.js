@@ -1,25 +1,25 @@
-import dbController from "./db.js";
+import DBController from "./DBController.js";
 import { v4 as uuid } from 'uuid';
 
 class RecordChat {
-    static record_chat = function (chatid, name, input, time) {
+    static RecordChat = function (chatid, name, input, time) {
         var dateString = time;
         if (dateString == null) {
             const now = new Date();
             dateString = now.toLocaleString();
         }
 
-        var chat = dbController.load_chat_db(chatid);
+        var chat = DBController.LoadChatDB(chatid);
         const newChat = [...chat, { name: name, content: input, time: dateString }];
-        dbController.save_chat_db(chatid, newChat);
+        DBController.SaveChatDB(chatid, newChat);
     }
 
-    static load_all_chat = function (chatid) {
-        var chat = dbController.load_chat_db(chatid);
+    static LoadAllChat = function (chatid) {
+        var chat = DBController.LoadChatDB(chatid);
         return chat;
     }
 
-    static save_summary = function (chatid, allchat, summary, topic) {
+    static SaveSummary = function (chatid, allchat, summary, topic) {
         var data = {
             topic : topic,
             summary : summary,
@@ -27,9 +27,9 @@ class RecordChat {
         };
 
         const newChat = [];
-        dbController.save_chat_db(uuid(), newChat);
+        DBController.SaveChatDB(uuid(), newChat);
 
-        return dbController.save_chat_summary(chatid, data);
+        return DBController.SaveChatSummary(uuid(), data);
     }
 }
 
