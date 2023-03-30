@@ -2,17 +2,29 @@ import { WechatyBuilder } from "wechaty";
 import dotenv from "dotenv";
 import qrcode from "qrcode-terminal";
 import ConversationControl from "./db/conversation_controller.js"
+import { PuppetXp } from 'wechaty-puppet-xp'
 
 dotenv.config();
 
-const bot = WechatyBuilder.build({
-    name: "test-bot",
-    memory: false,
-    puppetOptions: {
-        uos: process.env.WECHATY_PUPPET == "wechaty-puppet-wechat"
-    },
-    puppet: process.env.WECHATY_PUPPET
-})
+const MessageTypeStr = [
+    "Unknown",
+    "Attachment",
+    "Audio",
+    "Contact",
+    "ChatHistory",
+    "Emoticon",
+    "Image",
+    "Text",
+    "Location",
+    "MiniProgram",
+    "GroupNote",
+    "Transfer",
+    "RedEnvelope",
+    "Recalled",
+    "Url",
+    "Video",
+    "Post"
+];
 
 function onScan(payload) {
     console.log(payload);
@@ -40,8 +52,14 @@ async function onMessage(message) {
         return;
     }
 
-    if (message.payload.type != 7) {
-        console.log("Message discarded because unsupported. type is \'" + bot.Message.Type[message.type()] + "\'");
+    if (message.payload.type != bot.Message.Type.Text && message.payload.type != bot.Message.Type.ChatHistory) {
+        console.log("Message discarded because unsupported. type is \'" + MessageTypeStr[message.payload.type] + "\'");
+        return;
+    }
+
+    if (message.talker() == undefined || message.listener() == undefined) {
+        console.log("Message discarded because message error");
+        console.log(message);
         return;
     }
 
@@ -54,7 +72,7 @@ async function onMessage(message) {
 
     var in_room = false;
 
-    if (message.payload.roomId == undefined) {
+    if (message.payload.roomId == undefined || message.payload.roomId == "") {
         msg.conversationid = message.payload.talkerId;
         msg.from = message.talker().name();
         msg.content = message.text();
@@ -68,7 +86,12 @@ async function onMessage(message) {
         msg.topic = "在" + room_topic + "中的对话";
     }
 
-    console.log("recv:" + msg.content + " age:" + message.age());
+    if (message.payload.type == bot.Message.Type.ChatHistory)
+    {
+        console.log("recv:" + msg.content + " age:" + message.age());
+    } else if (message.payload.type == 4) {
+        console.log("recv:" + "聊天记录" + " age:" + message.age());
+    }
 
     var mentionSelf = "@" + message.listener().name();
 
@@ -108,15 +131,46 @@ async function onMessage(message) {
         var conversation = ConversationControl.find_conversation(msg.conversationid);
         if (conversation != null) {
             if (conversation.type == "record") {
-                ConversationControl.record_conversation(msg.conversationid, msg.from, msg.content);
+                if (message.payload.type == bot.Message.Type.Text) {
+                    ConversationControl.record_conversation(msg.conversationid, msg.from, msg.content);
+                } else if (message.payload.type == bot.Message.Type.ChatHistory) {
+                    ConversationControl.record_chatlog(msg.conversationid, msg.content);
+                }
             } else if (conversation.type == "dialog") {
-                ConversationControl.dialog_conversation(msg.conversationid, msg.content).then((result)=>{
+                ConversationControl.dialog_conversation(msg.conversationid, msg.content).then((result) => {
                     message.say(result.message);
                 });
             }
         }
     }
 }
+
+var bot = null;
+
+if (process.env.WECHATY_PUPPET == "wechaty-puppet-wechat") {
+    console.log("start wechaty-puppet-wechat");
+    const tmp = WechatyBuilder.build({
+        name: "test-bot",
+        memory: false,
+        puppetOptions: {
+            uos: true
+        },
+        puppet: process.env.WECHATY_PUPPET
+    })
+
+    bot = tmp;
+} else if (process.env.WECHATY_PUPPET == "wechaty-puppet-xp") {
+    console.log("start wechaty-puppet-xp");
+    const puppet = new PuppetXp()
+    const tmp = WechatyBuilder.build({
+        name: "test-bot",
+        memory: false,
+        puppet,
+    })
+
+    bot = tmp;
+}
+
 
 bot.on('scan', onScan)
 bot.on('login', onLogin)

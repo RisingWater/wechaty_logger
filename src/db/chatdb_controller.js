@@ -2,9 +2,12 @@ import dbController from "./db.js";
 import { v4 as uuid } from 'uuid';
 
 class RecordChat {
-    static record_chat = function (chatid, name, input) {
-        const now = new Date();
-        const dateString = now.toLocaleString();
+    static record_chat = function (chatid, name, input, time) {
+        var dateString = time;
+        if (dateString == null) {
+            const now = new Date();
+            dateString = now.toLocaleString();
+        }
 
         var chat = dbController.load_chat_db(chatid);
         const newChat = [...chat, { name: name, content: input, time: dateString }];
@@ -22,6 +25,9 @@ class RecordChat {
             summary : summary,
             chat : allchat
         };
+
+        const newChat = [];
+        dbController.save_chat_db(uuid(), newChat);
 
         return dbController.save_chat_summary(chatid, data);
     }

@@ -4,6 +4,7 @@ import chat from "./chatdb_controller.js"
 import { Configuration, OpenAIApi } from "openai";
 import dotenv from "dotenv";
 import request from "request";
+import xml2js from "xml2js"
 
 dotenv.config();
 
@@ -63,7 +64,7 @@ function genMessagePrompt(history, current_input) {
 
 function genSummaryPrompt(allchat) {
     var chatstring = "聊天记录开始\n";
-    allchat.some((element)=> {
+    allchat.some((element) => {
         chatstring += element.time + " " + element.name + "\n" + element.content + "\n";
     })
     chatstring += "聊天记录结束\n";
@@ -122,7 +123,32 @@ class ConversationControl {
     }
 
     static record_conversation = function (chatid, name, content) {
-        chat.record_chat(chatid, name, content);
+        chat.record_chat(chatid, name, content, null);
+    }
+
+    static record_chatlog = function (chatid, chatlog) {
+        xml2js.parseString(chatlog, (err, result) => {
+            if (err == null) {
+                console.log(result.msg.appmsg.some((element) => {
+                    element.recorditem.some((record) => {
+                        xml2js.parseString(record, (err, record2) => {
+                            if (err == null) {
+                                record2.recordinfo.datalist.some((data) => {
+                                    data.dataitem.some((item) => {
+                                        if (item.datadesc != undefined && item.datadesc != null) {
+                                            console.log(item.sourcetime[0] + " " + item.sourcename[0] + ":\n" + item.datadesc[0]);
+                                            chat.record_chat(chatid, item.sourcename[0], item.datadesc[0], item.sourcetime[0]);
+                                        }
+                                    })
+                                })
+                            }
+                        })
+                    })
+                }));
+            } else {
+                console.log(error);
+            }
+        });
     }
 
     static summary_recorded_conversation = async function (chatid, topic) {
@@ -157,6 +183,8 @@ class ConversationControl {
         if (data.result == 0) {
             chat.save_summary(chatid, allchat, data.message, topic);
         }
+
+        chat.clear_c
 
         return data;
     }
@@ -196,7 +224,7 @@ class ConversationControl {
         return data;
     }
 
-    static dialog_conversation_end = function(chatid) {
+    static dialog_conversation_end = function (chatid) {
         aichat.clear_ai_aichat(chatid);
     }
 }
