@@ -89,13 +89,11 @@ class PromptCreator {
     static CreateQuestionPrompt = async function (content) {
         var result = await AIInterface.Embedding(content);
 
-        console.log("result: " + result);
-
         if (result.result != 0) {
             return null;
         }
 
-        var closestParagraphs = findClosestParagraphs(result.message, 3);
+        var closestParagraphs = findClosestParagraphs(result.message, 5);
 
         var prompt =
             //"Answer the following question from the context, if the answer can not be deduced from the context, say '我不知道' :" +

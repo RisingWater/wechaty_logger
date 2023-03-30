@@ -1,6 +1,1 @@
-[
-    {
-        "chatid": "risingwater",
-        "type": "question"
-    }
-]
+[]

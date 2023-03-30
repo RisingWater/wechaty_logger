@@ -17,8 +17,11 @@ function onScan(payload) {
     qrcode.generate(payload);
 }
 
+var selfName = "";
+
 async function onLogin(user) {
     console.log("Bot: " + user.name() + "is logined");
+    selfName = user.name();
 }
 
 function onLogout(user) {
@@ -42,7 +45,7 @@ async function onMessage(message) {
         return;
     }
 
-    if (message.talker() == undefined || message.listener() == undefined) {
+    if (message.talker() == undefined) {
         console.log("Message discarded because message error");
         console.log(message);
         return;
@@ -77,7 +80,7 @@ async function onMessage(message) {
         console.log("recv:" + "聊天记录" + " in: " + msg.topic + " from: " + msg.from + " age:" + message.age());
     }
 
-    var mentionSelf = "@" + message.listener().name();
+    var mentionSelf = "@" + selfName;
 
     var commandstr = null;
 
