@@ -1,22 +1,12 @@
 import DBController from "./DBController.js";
 import crypto from "crypto";
+import cosineSimilarity from 'cosine-similarity';
 
 function md5(str) {
     const hash = crypto.createHash('md5');
     hash.update(str);
     return hash.digest('hex');
 }
-
-function compareEmbeddings(embedding1, embedding2) {
-    var length = Math.min(embedding1.length, embedding2.length);
-    var dotprod = 0;
-
-    for (var i = 0; i < length; i++) {
-        dotprod += embedding1[i] * embedding2[i];
-    }
-
-    return dotprod;
-};
 
 class EmbeddedControl {
     static ListEmbedded = function () {
@@ -60,7 +50,7 @@ class EmbeddedControl {
     
             items.push({
                 fragment: element.content,
-                score: compareEmbeddings(questionEmbedding, currentEmbedding),
+                score: cosineSimilarity(questionEmbedding, currentEmbedding),
             });
         });
     
