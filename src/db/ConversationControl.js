@@ -62,7 +62,7 @@ class ConversationControl {
 
     static SummaryRecord = async function (chatid, topic) {
         var allchat = RecordChat.LoadAllChat(chatid);
-        var messages = PromptCreator.CreateSummaryPrompt(allchat);
+        var messages = await PromptCreator.CreateSummaryPrompt(allchat);
         var data = await AIInterface.ChatCompletion(messages);
 
         if (data.result == 0) {
@@ -74,7 +74,7 @@ class ConversationControl {
 
     static ProcessDialog = async function (chatid, input) {
         var history = DialogChat.ListChat(chatid);
-        var messages = PromptCreator.CreateDialogPrompt(history, input);
+        var messages = await PromptCreator.CreateDialogPrompt(history, input);
         DialogChat.AddUserChat(chatid, input);
         var data = await AIInterface.ChatCompletion(messages);
 
@@ -90,7 +90,10 @@ class ConversationControl {
     }
 
     static ProcessQuestion = async function (chatid, input) {
-        var messages = genQuestionPrompt(input);
+        var messages = await PromptCreator.CreateQuestionPrompt(input);
+        if (messages == null) {
+            return JSON.parse("{ result:-1, message:\"CreateQuestionPrompt failed\"}");
+        }
         DialogChat.AddUserChat(chatid, input);
         var data = await AIInterface.ChatCompletion(messages);
 

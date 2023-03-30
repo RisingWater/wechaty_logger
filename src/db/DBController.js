@@ -47,6 +47,10 @@ class DBController {
     static SaveConversationDB = function (data) {
         return SaveDB(db_dir + 'conversationdb.js', data);
     }
+
+    static LoadEmbeddedDB = function () {
+        return LoadDB(db_dir + 'embedded/embedded_data.txt');
+    }
 }
 
 export default DBController;

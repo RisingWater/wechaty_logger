@@ -31,7 +31,7 @@ function ShowBalance() {
 }
 
 class AIInterface {
-    static ChatCompletion = async function(content) {
+    static ChatCompletion = async function (content) {
         var data = {
             result: 0,
             message: ""
@@ -54,7 +54,39 @@ class AIInterface {
                 data.result = error.response.status;
                 data.message = error.response.data;
             } else {
-                data.result = 1;
+                data.result = -1;
+                data.message = "other error!";
+            }
+        }
+
+        return data;
+    }
+
+    static Embedding = async function (content) {
+        var data = {
+            result: 0,
+            message: ""
+        };
+
+        try {
+            const embedded = await openai.createEmbedding({
+                input: content,
+                model: "text-embedding-ada-002",
+            });
+
+            if (embedded.data.data.length) {
+                data.message = embedded.data.data[0].embedding;
+            } else {
+                data.result = -1;
+                data.message = "Question not embedded properly";
+            }
+        } catch (error) {
+            console.log(error);
+            if (error.response) {
+                data.result = error.response.status;
+                data.message = error.response.data;
+            } else {
+                data.result = -1;
                 data.message = "other error!";
             }
         }
