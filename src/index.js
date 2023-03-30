@@ -86,11 +86,11 @@ async function onMessage(message) {
         msg.topic = "在" + room_topic + "中的对话";
     }
 
-    if (message.payload.type == bot.Message.Type.ChatHistory)
+    if (message.payload.type != bot.Message.Type.ChatHistory)
     {
-        console.log("recv:" + msg.content + " age:" + message.age());
-    } else if (message.payload.type == 4) {
-        console.log("recv:" + "聊天记录" + " age:" + message.age());
+        console.log("recv:" + msg.content + " in: " + msg.topic + " from: " + msg.from + " age:" + message.age());
+    } else if (message.payload.type == bot.Message.Type.Text) {
+        console.log("recv:" + "聊天记录" + " in: " + msg.topic + " from: " + msg.from + " age:" + message.age());
     }
 
     var mentionSelf = "@" + message.listener().name();
