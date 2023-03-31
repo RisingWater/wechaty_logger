@@ -1,6 +1,7 @@
 import fs from "fs";
 import AIInterface from "./utils/AIInterface.js"
 import EmbeddedControl from "./db/EmbeddedControl.js"
+import PromptCreator from "./utils/PromptCreator.js"
 
 const FragmentMinSize = 5;
 
@@ -47,8 +48,12 @@ async function generateEmbedding(filePath) {
         if (!EmbeddedControl.FindEmbedded(Fragment)) {
             var result = await AIInterface.Embedding(Fragment);
             if (result.result == 0) {
-                var md5 = EmbeddedControl.AddEmbedded(Fragment, result.message);
-                console.log("Fragment[" + i + "] Embedding finish, md5: " + md5);
+                var messages = await PromptCreator.CreateDialogPrompt([], "给下面这些资料取一个标题:\n资料:\n\n" + Fragment + "\n\n标题: \n");
+                var summary_result = await AIInterface.ChatCompletion(messages);
+                if (summary_result.result == 0) {
+                    var md5 = EmbeddedControl.AddEmbedded(Fragment, result.message, summary_result.message);
+                    console.log("Fragment[" + i + "] Embedding finish, summary: " + summary_result.message + " md5: " + md5);
+                }
             }
         } else {
             console.log("Fragment[" + i + "] is already Embedded");

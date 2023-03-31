@@ -1,6 +1,7 @@
 import DBController from "./DBController.js";
 import crypto from "crypto";
 import cosineSimilarity from 'cosine-similarity';
+import { v4 as uuid } from 'uuid';
 
 function md5(str) {
     const hash = crypto.createHash('md5');
@@ -27,9 +28,11 @@ class EmbeddedControl {
         return found;
     }
 
-    static AddEmbedded = function (content, Embedded) {
+    static AddEmbedded = function (content, Embedded, summary) {
         var list = DBController.LoadEmbeddedDB();
         var embedded = {
+            id: uuid(),
+            summary: summary,
             embedding: Embedded,
             content: content,
             created: new Date().getTime(),
