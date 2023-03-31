@@ -23,6 +23,7 @@
     "jquery": "^3.6.4",
     "less-loader": "^11.1.0",
     "openai": "^3.2.1",
+    "react-highlight-words": "^0.20.0",
     "request": "^2.88.2",
     "style-loader": "^3.3.2",
     "uuid": "^9.0.0",

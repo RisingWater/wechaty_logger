@@ -7,8 +7,7 @@ class DialogChat {
     }
 
     static AddUserChat = function (chatid, input) {
-        const now = new Date();
-        const dateString = now.toLocaleString();
+        const dateString = new Date().toLocaleString();
 
         var chat = DBController.LoadAIChatDB(chatid);
         const newChat = [...chat, { name: 'You', role: 0, content: input, time: dateString }];
@@ -16,8 +15,7 @@ class DialogChat {
     }
 
     static AddAIChat = function (chatid, input) {
-        const now = new Date();
-        const dateString = now.toLocaleString();
+        const dateString = new Date().toLocaleString();
 
         var chat = DBController.LoadAIChatDB(chatid);
         const newChat = [...chat, { name: 'Chatgpt', role: 1, content: input, time: dateString }];

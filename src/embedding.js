@@ -25,7 +25,7 @@ async function generateEmbedding(filePath) {
         var RawFragments = rawText.split(/\n\s*\n/);
 
         for (var i = 0; i < RawFragments.length; i++) {
-            var TextFragment = RawFragments[i].trim().replaceAll("\n", " ").replace(/\r/g, "");
+            var TextFragment = RawFragments[i].trim().replace(/\r/g, "");
 
             if (TextFragment.split(/\s+/).length >= FragmentMinSize) {
                 TextFragments.push(TextFragment);

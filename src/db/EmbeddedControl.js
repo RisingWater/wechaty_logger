@@ -14,6 +14,23 @@ class EmbeddedControl {
         return DBController.LoadEmbeddedDB();
     }
 
+    static ListEmbeddedInfo = function () {
+        var Infolist = [];
+        var list = DBController.LoadEmbeddedDB();
+        list.some((element) => {
+            var info = {
+                id: element.id,
+                embeddingTime : element.embeddingTime,
+                summary: element.summary,
+                content: element.content,
+            }
+
+            Infolist.push(info);
+        })
+
+        return Infolist;
+    }
+
     static FindEmbedded = function (content) {
         var found = false;
         var list = DBController.LoadEmbeddedDB();
@@ -32,10 +49,10 @@ class EmbeddedControl {
         var list = DBController.LoadEmbeddedDB();
         var embedded = {
             id: uuid(),
+            embeddingTime : new Date().toLocaleString(),
             summary: summary,
             embedding: Embedded,
             content: content,
-            created: new Date().getTime(),
             md5sum: md5(content)
         };
         list.push(embedded);
