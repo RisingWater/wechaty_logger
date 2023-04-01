@@ -6,6 +6,7 @@ module.exports = {
     mode: 'production',
     entry: {
         nahida_bundle: './src/nahida_bundle.js',
+        useroperation_bundle: './src/useroperation_bundle.js',
     },
     output: {
         filename: '[name].js',

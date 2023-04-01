@@ -31,6 +31,33 @@ class EmbeddedControl {
         return Infolist;
     }
 
+    static DeleteEmbedded = function (id) {
+        var list = DBController.LoadEmbeddedDB();
+        var newlist = list.filter((element) => {
+            if (element.id != id) {
+                return true;
+            }
+            return false;
+        })
+
+        DBController.SaveEmbeddedDB(newlist);
+        return;
+    }
+
+    static UpdateEmbedded = function (id, summary, content, Embedded) {
+        var list = DBController.LoadEmbeddedDB();
+        list.some((element) => {
+            if (element.id == id) {
+                var md5sum = md5(content);
+                element.summary = summary;
+                element.md5sum = md5sum;
+                element.content = content;
+                element.embedding = Embedded;
+                element.embeddingTime = new Date().toLocaleString()
+            }
+        })
+    }
+
     static FindEmbedded = function (content) {
         var found = false;
         var list = DBController.LoadEmbeddedDB();

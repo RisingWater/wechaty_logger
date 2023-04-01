@@ -55,6 +55,14 @@ class DBController {
     static SaveEmbeddedDB = function (data) {
         return SaveDB(db_dir + 'embedded/embedded.js', data);
     }
+
+    static LoadUserDB = function() {
+        return LoadDB(db_dir + 'userdb.js');
+    }
+
+    static SaveUserDB = function(data) {
+        return SaveDB(db_dir + 'userdb.js', data);
+    }
 }
 
 export default DBController;
