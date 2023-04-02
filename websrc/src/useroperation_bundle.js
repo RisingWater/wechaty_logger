@@ -1,8 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Layout, Alert, Form, Input, Button, Typography } from 'antd';
-import { MailOutlined, LockOutlined } from '@ant-design/icons'
 import $ from 'jquery';
+
+import { 
+    Layout,
+    Alert,
+    Form,
+    Input,
+    Button,
+    Typography
+} from 'antd';
+
+import {
+    MailOutlined,
+    LockOutlined
+} from '@ant-design/icons'
 
 function setCookie(name, value) {
     var Days = 30;
@@ -116,7 +128,7 @@ class RootContext extends React.Component {
                 <Layout.Content style={{ flex: '1 0 auto', padding: 24, margin: 0, width: "100%", height: this.state.ContextHeight }}>
                     <div style={{ width: "100%", height: "100%" }}>
                         <div style={{ width: "300px", margin: "auto" }}>
-                            <Typography.Title>登录</Typography.Title>
+                            <Typography.Title level={3}>登录系统</Typography.Title>
                             {this.getAlert()}
                             <LoginForm showError={this.showError.bind(this)} />
                         </div>

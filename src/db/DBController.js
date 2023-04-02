@@ -63,6 +63,14 @@ class DBController {
     static SaveUserDB = function(data) {
         return SaveDB(db_dir + 'userdb.js', data);
     }
+
+    static LoadSysConfigDB = function() {
+        return LoadDB(db_dir + 'sysconfig.js');
+    }
+
+    static SaveSysConfigDB = function() {
+        return SaveDB(db_dir + 'sysconfig.js', data);
+    }
 }
 
 export default DBController;

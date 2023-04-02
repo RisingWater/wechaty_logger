@@ -1,17 +1,15 @@
 import { Configuration, OpenAIApi } from "openai";
-import dotenv from "dotenv";
+import SysConfigControl from "../db/SysConfigControl.js"
 import request from "request";
 
-dotenv.config();
-
 const configuration = new Configuration({
-    organization: process.env.OPENAI_API_ORGANIZATION,
-    apiKey: process.env.OPENAI_API_KEY,
+    organization: SysConfigControl.get().orgid,
+    apiKey: SysConfigControl.get().apikey,
 });
 
 const request_headers = {
-    "Authorization": "Bearer " + process.env.OPENAI_API_KEY,
-    "OpenAI-Organization": process.env.OPENAI_API_ORGANIZATION,
+    "Authorization": "Bearer " + SysConfigControl.get().apikey,
+    "OpenAI-Organization": SysConfigControl.get().orgid,
     "Content-Type": "application/json"
 };
 
@@ -89,6 +87,8 @@ class AIInterface {
                 data.message = "other error!";
             }
         }
+
+        console.log(data);
 
         return data;
     }

@@ -99,9 +99,15 @@ class ConversationControl {
 
     static ProcessQuestion = async function (chatid, input) {
         var allchat = RecordChat.LoadAllChat(chatid);
+        console.log("allchat:" + allchat);
+        console.log("chatid: " + chatid + " input:" + input);
         var messages = await PromptCreator.CreateQuestionPrompt(allchat, input);
         if (messages == null) {
-            return JSON.parse("{ result:-1, message:\"CreateQuestionPrompt failed\"}");
+            var data = {
+                result: -1,
+                messsages: "CreateQuestionPrompt failed"
+            };
+            return data;
         }
         DialogChat.AddUserChat(chatid, input);
         var data = await AIInterface.ChatCompletion(messages);

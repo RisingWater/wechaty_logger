@@ -1,7 +1,16 @@
 import React from 'react';
-import { Form, Input, Button } from 'antd';
-import { MailOutlined, LockOutlined } from '@ant-design/icons'
 import $ from 'jquery';
+
+import {
+    Form,
+    Input,
+    Button,
+    Typography
+} from 'antd';
+
+import {
+    LockOutlined
+} from '@ant-design/icons'
 
 function getCookie(name) {
     var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
@@ -63,7 +72,7 @@ export class ChangePassword extends React.Component {
 
     getAlert() {
         if (this.state.showError) {
-            return (<div style={{ marginBottom: 20 }}><Alert message={"登录失败，请检查用户名和密码"} type="error" showIcon closable /></div>);
+            return (<div style={{ marginBottom: 20 }}><Alert message={"修改密码失败，用户不存在"} type="error" showIcon closable /></div>);
         }
         else {
             return (<div />);
@@ -73,8 +82,8 @@ export class ChangePassword extends React.Component {
     render() {
         return (
             <div style={{ width: "100%", height: "100%" }}>
-                <div style={{ width: "300px", margin: "auto" }}>
-                <Typography.Title>修改密码</Typography.Title>
+                <div style={{ width: "300px", marginLeft : "20px"}}>
+                    <Typography.Title level={3}>修改密码</Typography.Title>
                     {this.getAlert()}
                     <Form name="changepassword"
                         onFinish={this.onFinish}
@@ -97,8 +106,8 @@ export class ChangePassword extends React.Component {
                             ]}>
                             <Input.Password prefix={<LockOutlined />} placeholder="请再次输入新密码" />
                         </Form.Item>
-                        <Form.Item>
-                            <Button type="primary" htmlType="submit" block>修改</Button>
+                        <Form.Item style={{ marginTop: '20px' }}>
+                            <Button type="primary" htmlType="submit">修改</Button>
                         </Form.Item>
                     </Form>
                 </div>

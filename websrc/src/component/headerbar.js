@@ -1,6 +1,13 @@
 import React from 'react';
-import { Layout, Tooltip, Button } from 'antd';
-import { LogoutOutlined } from '@ant-design/icons' 
+import {
+    Layout,
+    Tooltip,
+    Button
+} from 'antd';
+
+import {
+    LogoutOutlined
+} from '@ant-design/icons'
 
 function clearCookie() {
     var keys = document.cookie.match(/[^ =;]+(?=\=)/g);

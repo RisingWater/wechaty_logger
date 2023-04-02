@@ -1,15 +1,32 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Layout, Menu } from 'antd';
-import { DatabaseOutlined, AppstoreOutlined, UnorderedListOutlined, QuestionCircleOutlined, LockOutlined } from '@ant-design/icons';
 import $ from 'jquery';
+
+import { 
+    Layout,
+    Menu
+} from 'antd';
+
+import {
+    DatabaseOutlined,
+    AppstoreOutlined,
+    UnorderedListOutlined,
+    QuestionCircleOutlined,
+    LockOutlined,
+    SettingOutlined,
+    RobotOutlined,
+    WechatOutlined,
+    SolutionOutlined
+} from '@ant-design/icons';
+
 
 import { HeaderBar } from './component/HeaderBar.js'
 import { KnowledgeList } from './component/KnowledgeList.js'
 import { ChangePassword } from './component/ChangePassword.js';
+import { SystemConfig } from './component/SystemConfig.js';
+import { QuestionTest } from './component/QuestionTest.js';
 
-function getCookie(name)
-{
+function getCookie(name) {
     var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
     return (arr = document.cookie.match(reg)) ? unescape(arr[2]) : null;
 }
@@ -29,7 +46,12 @@ const items = [
         getItem('知识列表', 'nahida', <UnorderedListOutlined />),
         getItem('测试知识库', 'question', <QuestionCircleOutlined />)
     ]),
-    getItem('系统管理', 'sub2', <AppstoreOutlined />, [
+    getItem('微信机器人', 'sub2', <RobotOutlined />, [
+        getItem('微信设置', 'wechat_setting', <WechatOutlined />),
+        getItem('聊天记录', 'chatlog', <SolutionOutlined />)
+    ]),
+    getItem('系统管理', 'sub3', <AppstoreOutlined />, [
+        getItem('系统设置', 'sysconfig', <SettingOutlined />),
         getItem('修改密码', 'changepassword', <LockOutlined />),
     ])
 ];
@@ -41,11 +63,11 @@ class RootContext extends React.Component {
         this.state = {
             ContextHeight: 0,
             menuSelectedkey: "nahida",
-            user : {
-                result : -1,
-                userid : "",
-                username : "",
-                isAdmin : false
+            user: {
+                result: -1,
+                userid: "",
+                username: "",
+                isAdmin: false
             }
         }
     }
@@ -59,12 +81,12 @@ class RootContext extends React.Component {
         }
 
         var json = JSON.stringify({
-            userid : userid,
+            userid: userid,
         })
 
         $.ajax({
             type: "post",
-            url:  "/user/check",
+            url: "/user/check",
             contentType: "application/json",
             data: json,
             async: false,
@@ -80,11 +102,11 @@ class RootContext extends React.Component {
         });
 
         if (user != null) {
-            this.setState({ user : user });
+            this.setState({ user: user });
             if (user.username == "guest") {
-                this.setState({ guest : true});
+                this.setState({ guest: true });
             } else {
-                this.setState({ guest : false});
+                this.setState({ guest: false });
             }
         }
 
@@ -122,6 +144,8 @@ class RootContext extends React.Component {
             return (<QuestionTest />);
         } else if (this.state.menuSelectedkey == "changepassword") {
             return (<ChangePassword />);
+        } else if (this.state.menuSelectedkey == "sysconfig") {
+            return (<SystemConfig />);
         } else {
             return (<div></div>);
         }
@@ -131,7 +155,7 @@ class RootContext extends React.Component {
         return (
             <Layout>
                 <div ref={this.HeaderRef}>
-                    <HeaderBar user={this.state.user}/>
+                    <HeaderBar user={this.state.user} />
                 </div>
                 <Layout>
                     <Layout.Sider>

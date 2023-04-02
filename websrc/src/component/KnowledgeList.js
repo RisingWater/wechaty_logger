@@ -1,7 +1,26 @@
 import React from 'react';
-import { Table, Button, Popconfirm, Input, Pagination, Collapse, Typography, Space, Modal, Form } from 'antd';
-import { DeleteOutlined, EditOutlined, PlusCircleOutlined, FileAddOutlined } from '@ant-design/icons'
 import $ from 'jquery';
+
+import {
+    Table,
+    Button,
+    Popconfirm,
+    Input,
+    Pagination,
+    Collapse,
+    Typography,
+    Space,
+    Modal,
+    Form
+} from 'antd';
+
+import {
+    DeleteOutlined,
+    EditOutlined,
+    PlusCircleOutlined,
+    FileAddOutlined
+} from '@ant-design/icons'
+
 
 export class KnowledgeList extends React.Component {
     constructor(props) {
