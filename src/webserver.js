@@ -4,7 +4,9 @@ import EmbeddingService from "./webservice/EmbeddingService.js"
 import UserService from "./webservice/UserService.js"
 import SysConfigService from "./webservice/SysConfigService.js"
 import ChatService from "./webservice/ChatService.js"
+import LogService from './webservice/LogService.js';
 
+import LogControl from './utils/LogUtils.js';
 import SysConfigControl from "./db/SysConfigControl.js"
 
 const app = express();
@@ -31,6 +33,8 @@ app.post('/sys/config', SysConfigService.config);
 app.post('/chat/list', ChatService.list);
 app.post('/chat/chatWithKnowledge', ChatService.chatWithKnowledge);
 
+app.post('/log/get', LogService.get);
+
 app.listen(SysConfigControl.get().port, () => {
-    console.log('Server started on port ' + SysConfigControl.get().port);
+    LogControl.Info('Server started on port ' + SysConfigControl.get().port);
 });

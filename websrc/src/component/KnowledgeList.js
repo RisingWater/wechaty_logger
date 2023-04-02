@@ -50,7 +50,7 @@ export class KnowledgeList extends React.Component {
         })
     }
 
-    onSearch(value) {
+    onSearch = (value) => {
         this.setState({
             searchText: value,
             dataSource: this.filterData(value, this.state.orgDataSource)
@@ -191,7 +191,7 @@ export class KnowledgeList extends React.Component {
         this.RefreshData();
     }
 
-    ShowAddDialog(e) {
+    ShowAddDialog = (e) => {
         this.setState({
             showDialog: true,
             isEdit: false,
@@ -204,7 +204,7 @@ export class KnowledgeList extends React.Component {
         });
     }
 
-    ShowModifyDialog(record) {
+    ShowModifyDialog = (record) => {
         this.setState({
             showDialog: true,
             isEdit: true,
@@ -212,7 +212,7 @@ export class KnowledgeList extends React.Component {
         });
     }
 
-    handleOk() {
+    handleOk = () => {
         this.FormRef.current.validateFields()
             .then((values) => {
                 this.UpdateData(values);
@@ -230,7 +230,7 @@ export class KnowledgeList extends React.Component {
             });
     };
 
-    handleCancel() {
+    handleCancel = () => {
         this.setState({
             showDialog: false,
             isEdit: false,
@@ -248,7 +248,7 @@ export class KnowledgeList extends React.Component {
             <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, marginBottom: 16 }}>
                     <Space>
-                        <Button type="primary" icon={<PlusCircleOutlined />} onClick={this.ShowAddDialog.bind(this)} style={{ marginRight: 8 }}>添加知识</Button>
+                        <Button type="primary" icon={<PlusCircleOutlined />} onClick={this.ShowAddDialog} style={{ marginRight: 8 }}>添加知识</Button>
                         <Popconfirm title="敬请期待"
                             description="功能尚未实现"
                             okText="确认">
@@ -256,7 +256,7 @@ export class KnowledgeList extends React.Component {
                         </Popconfirm>
                     </Space>
                     <div>
-                        <Input.Search placeholder="搜索知识" onSearch={this.onSearch.bind(this)} style={{ width: 400 }} allowClear enterButton />
+                        <Input.Search placeholder="搜索知识" onSearch={this.onSearch} style={{ width: 400 }} allowClear enterButton />
                     </div>
                 </div>
                 <Table
@@ -271,8 +271,8 @@ export class KnowledgeList extends React.Component {
                     okText="确认"
                     cancelText="取消"
                     open={this.state.showDialog}
-                    onOk={this.handleOk.bind(this)}
-                    onCancel={this.handleCancel.bind(this)}
+                    onOk={this.handleOk}
+                    onCancel={this.handleCancel}
                     width={700}
                     destroyOnClose>
                     <Form

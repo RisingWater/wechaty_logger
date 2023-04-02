@@ -1,4 +1,6 @@
 import UserControl from "../db/UserControl.js";
+import LogControl from "../utils/LogUtils.js";
+
 
 class UserService {
     static check = function (req, res) {
@@ -9,6 +11,8 @@ class UserService {
             username: "",
             isAdmin: false
         }
+        
+        LogControl.Trace("UserService check userid " + req.body.userid);
 
         user = UserControl.find_byuserid(req.body.userid);
 
@@ -17,6 +21,8 @@ class UserService {
             result.username = user.username;
             result.isAdmin = user.isAdmin;
         }
+
+        LogControl.Trace("UserService check done " + JSON.stringify(result, null, 4));
 
         res.send(result);
     }
@@ -27,12 +33,17 @@ class UserService {
             userid: "",
         }
 
+        LogControl.Trace("UserService login username " + req.body.username);
+
         var user = UserControl.find_byusernameandpassword(req.body.username, req.body.password);
 
         if (user != null) {
             result.result = 0;
             result.userid = user.userid;
-        }
+            LogControl.Trace("UserService login success " + JSON.stringify(result, null, 4));
+        } else {
+            LogControl.Info("UserService login failed " + JSON.stringify(result, null, 4));
+        }      
 
         res.send(result);
     }
@@ -43,6 +54,8 @@ class UserService {
             result: -1
         }
 
+        LogControl.Trace("UserService changepassword userid " + req.body.userid);
+
         user = UserControl.find_byuserid(req.body.userid);
 
         if (user != null) {
@@ -50,7 +63,12 @@ class UserService {
                 user.password = req.body.password_new;
                 UserControl.update(user);
                 result.result = 0;
+                LogControl.Info("UserService changepassword success");
+            } else {
+                LogControl.Info("UserService changepassword failed because password is not right");
             }
+        } else {
+            LogControl.Info("UserService changepassword failed because can not find user");
         }
 
         res.send(result);

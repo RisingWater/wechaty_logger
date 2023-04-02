@@ -5,7 +5,8 @@ import {
     Form,
     Input,
     Button,
-    Typography
+    Typography,
+    Alert
 } from 'antd';
 
 import {
@@ -18,44 +19,39 @@ function getCookie(name) {
 }
 
 export class ChangePassword extends React.Component {
-    constructor(props, context) {
-        super(props, context)
+    constructor(props) {
+        super(props);
         this.formRef = React.createRef();
         this.state = {
-            userid: ""
+            userid: "",
+            hideAlert: true,
+            configResult: 0
         };
     }
 
     componentWillMount() {
         var userid = getCookie("userid");
-        this.setState({ userid: userid });
+        this.setState({
+            userid: userid
+        });
     }
 
     onFinish = (values) => {
         var json = { "userid": this.state.userid, "password": values.password, "password_new": values.password_new };
 
-        var change = false;
         $.ajax({
             type: "post",
             url: "user/changepassword",
             contentType: "application/json",
             async: false,
             data: JSON.stringify(json),
-            success: function (data, status) {
-                if (data.result == 0) {
-                    change = true;
-                } else {
-                    console.log("changepassword ajax failed " + data.result);
-                }
+            success: (data, status) => {
+                this.setState({
+                    hideAlert: false,
+                    configResult: data.result
+                });
             }
         })
-
-        if (change == false) {
-            this.setState({ showError: true });
-            return;
-        }
-
-        window.location.href = "./index.html";
     }
 
     onFinishFailed = (errorInfo) => {
@@ -71,8 +67,12 @@ export class ChangePassword extends React.Component {
     };
 
     getAlert() {
-        if (this.state.showError) {
-            return (<div style={{ marginBottom: 20 }}><Alert message={"修改密码失败，用户不存在"} type="error" showIcon closable /></div>);
+        if (!this.state.hideAlert) {
+            if (this.state.configResult == 0) {
+                return (<div style={{ marginBottom: 20 }}><Alert message={"修改密码成功"} type="success" showIcon closable /></div>);
+            } else {
+                return (<div style={{ marginBottom: 20 }}><Alert message={"修改密码失败，错误代码" + this.state.configResult} type="error" showIcon closable /></div>);
+            }
         }
         else {
             return (<div />);
@@ -82,9 +82,9 @@ export class ChangePassword extends React.Component {
     render() {
         return (
             <div style={{ width: "100%", height: "100%" }}>
-                <div style={{ width: "300px", marginLeft : "20px"}}>
-                    <Typography.Title level={3}>修改密码</Typography.Title>
-                    {this.getAlert()}
+                <Typography.Title level={3}>修改密码</Typography.Title>
+                {this.getAlert()}
+                <div style={{ width: "300px", marginLeft: "20px" }}>
                     <Form name="changepassword"
                         onFinish={this.onFinish}
                         onFinishFailed={this.onFinishFailed}

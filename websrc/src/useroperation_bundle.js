@@ -82,8 +82,8 @@ class LoginForm extends React.Component {
 }
 
 class RootContext extends React.Component {
-    constructor(props, context) {
-        super(props, context)
+    constructor(props) {
+        super(props);
         this.HeaderRef = React.createRef();
 
         this.state = {
@@ -102,7 +102,7 @@ class RootContext extends React.Component {
         })
     }
 
-    showError(on) {
+    showError = (on) => {
         this.setState({ showError: on });
     }
 
@@ -130,7 +130,7 @@ class RootContext extends React.Component {
                         <div style={{ width: "300px", margin: "auto" }}>
                             <Typography.Title level={3}>登录系统</Typography.Title>
                             {this.getAlert()}
-                            <LoginForm showError={this.showError.bind(this)} />
+                            <LoginForm showError={this.showError} />
                         </div>
                     </div>
                 </Layout.Content>

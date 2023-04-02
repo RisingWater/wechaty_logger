@@ -5,6 +5,7 @@ import AIInterface from "../utils/AIInterface.js"
 import PromptCreator from "../utils/PromptCreator.js";
 import RecordHelper from "../utils/RecordHelper.js";
 import EmbeddedControl from "./EmbeddedControl.js"
+import LogControl from "../utils/LogUtils.js";
 
 class ConversationControl {
     static FindConversation = function (chatid) {
@@ -69,7 +70,7 @@ class ConversationControl {
         if (data.result == 0) {
             var summary = RecordChat.SaveSummary(chatid, allchat, data.message, topic);
 
-            AIInterface.Embedding(data.message).then((result)=>{
+            AIInterface.Embedding(data.message).then((result) => {
                 if (result.result == 0) {
                     var md5 = EmbeddedControl.AddEmbedded(Fragment, result.message);
                     console.log("Fragment[" + chatid + "] Embedding finish, md5: " + md5);
@@ -99,22 +100,29 @@ class ConversationControl {
 
     static ProcessQuestion = async function (chatid, input) {
         var allchat = RecordChat.LoadAllChat(chatid);
-        console.log("allchat:" + allchat);
-        console.log("chatid: " + chatid + " input:" + input);
+        var data = {
+            result: -1,
+            message: ""
+        };
+
+        LogControl.Trace("ProcessQuestion allchat count: " + allchat.length);
+        DialogChat.AddUserChat(chatid, input);
+
         var messages = await PromptCreator.CreateQuestionPrompt(allchat, input);
         if (messages == null) {
-            var data = {
-                result: -1,
-                messsages: "CreateQuestionPrompt failed"
-            };
-            return data;
+            data.message = "CreateQuestionPrompt failed";
+            LogControl.Error("ProcessQuestion CreateQuestionPrompt failed:" + JSON.stringify(data, null, 4));
+        } else {
+            var completion_data = await AIInterface.ChatCompletion(messages);
+            data.result = completion_data.result;
+            data.message = completion_data.message;
         }
-        DialogChat.AddUserChat(chatid, input);
-        var data = await AIInterface.ChatCompletion(messages);
-
-        if (data.result == 0) {
-            DialogChat.AddAIChat(chatid, data.message)
+        
+        if (data.result != 0) {
+            LogControl.Error("ProcessQuestion ChatCompletion failed:" + JSON.stringify(data, null, 4));
         }
+        
+        DialogChat.AddAIChat(chatid, data.message)
 
         return data;
     }

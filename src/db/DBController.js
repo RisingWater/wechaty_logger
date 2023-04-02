@@ -2,6 +2,7 @@ import path from "path";
 import fs from "fs";
 
 const db_dir = '/db/'
+const log = '/log/'
 
 function LoadDB(filename) {
     var file = path.join(process.cwd(), filename);
@@ -17,6 +18,25 @@ function LoadDB(filename) {
 function SaveDB(filename, data) {
     var file = path.join(process.cwd(), filename);
     fs.writeFileSync(file, JSON.stringify(data, null, 4));
+}
+
+function LoadRawFile(filename) {
+    var file = path.join(process.cwd(), filename);
+    if (fs.existsSync(file)) {
+        var data = fs.readFileSync(file, 'utf-8');
+        return data;
+    } else {
+        return "";
+    }
+}
+
+function SaveAppendRawFile(filename, data) {
+    var file = path.join(process.cwd(), filename);
+    if (fs.existsSync(file)) {
+        fs.appendFileSync(file, data);
+    } else {
+        fs.writeFileSync(file, data);
+    }
 }
 
 class DBController {
@@ -68,8 +88,16 @@ class DBController {
         return LoadDB(db_dir + 'sysconfig.js');
     }
 
-    static SaveSysConfigDB = function() {
+    static SaveSysConfigDB = function(data) {
         return SaveDB(db_dir + 'sysconfig.js', data);
+    }
+
+    static LoadLog = function(date) {
+        return LoadRawFile(db_dir + date + '.log');
+    }
+
+    static AppendLog = function(date, log) {
+        return SaveAppendRawFile(db_dir + date + '.log', log);
     }
 }
 

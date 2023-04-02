@@ -1,5 +1,6 @@
 {
 	"orgid": "",
 	"apikey": "",
-	"port": 8009
+	"port": 8009,
+	"loglevel": "3"
 }

@@ -16,7 +16,8 @@ import {
     SettingOutlined,
     RobotOutlined,
     WechatOutlined,
-    SolutionOutlined
+    SolutionOutlined,
+    FileSearchOutlined
 } from '@ant-design/icons';
 
 
@@ -25,6 +26,7 @@ import { KnowledgeList } from './component/KnowledgeList.js'
 import { ChangePassword } from './component/ChangePassword.js';
 import { SystemConfig } from './component/SystemConfig.js';
 import { QuestionTest } from './component/QuestionTest.js';
+import { LogList } from './component/LogList.js'
 
 function getCookie(name) {
     var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
@@ -51,6 +53,7 @@ const items = [
         getItem('聊天记录', 'chatlog', <SolutionOutlined />)
     ]),
     getItem('系统管理', 'sub3', <AppstoreOutlined />, [
+        getItem('日志查看', 'log', <FileSearchOutlined />),
         getItem('系统设置', 'sysconfig', <SettingOutlined />),
         getItem('修改密码', 'changepassword', <LockOutlined />),
     ])
@@ -131,7 +134,7 @@ class RootContext extends React.Component {
         })
     }
 
-    onMenuSelectChange(object) {
+    onMenuSelectChange = (object) => {
         var state = { menuSelectedkey: object.key };
         console.log(state);
         this.setState(state);
@@ -146,6 +149,8 @@ class RootContext extends React.Component {
             return (<ChangePassword />);
         } else if (this.state.menuSelectedkey == "sysconfig") {
             return (<SystemConfig />);
+        } else if (this.state.menuSelectedkey == "log") {
+            return (<LogList/>)
         } else {
             return (<div></div>);
         }
@@ -165,7 +170,7 @@ class RootContext extends React.Component {
                             mode="inline"
                             defaultOpenKeys={['sub1']}
                             items={items}
-                            onClick={this.onMenuSelectChange.bind(this)}>
+                            onClick={this.onMenuSelectChange}>
                         </Menu>
                     </Layout.Sider>
                     <Layout>

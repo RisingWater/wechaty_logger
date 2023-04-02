@@ -77,7 +77,7 @@ class ChatBox extends React.Component {
         };
     }
 
-    onChatBoxClick() {
+    onChatBoxClick = () => {
         this.setState({ isChatDisabled: true }, () => {
             var json = JSON.stringify({ chatid: this.props.chatid, input: this.state.inputValue })
 
@@ -105,11 +105,11 @@ class ChatBox extends React.Component {
         });
     }
 
-    onChatBoxClear() {
+    onChatBoxClear = () => {
         this.props.onClearChatLog();
     }
 
-    handleInputChange(event) {
+    handleInputChange = (event) => {
         this.setState({ inputValue: event.target.value });
     }
 
@@ -118,14 +118,14 @@ class ChatBox extends React.Component {
             <Space.Compact style={{ width: '100%' }}>
                 <Input placeholder="输入你的问题"
                     value={this.state.inputValue}
-                    onChange={this.handleInputChange.bind(this)}
-                    onPressEnter={this.onChatBoxClick.bind(this)}
+                    onChange={this.handleInputChange}
+                    onPressEnter={this.onChatBoxClick}
                     disabled={this.state.isChatDisabled} />
                 <Button type="primary"
-                    onClick={this.onChatBoxClick.bind(this)}
+                    onClick={this.onChatBoxClick}
                     loading={this.state.isChatDisabled}>提问</Button>
                 <Button
-                    onClick={this.onChatBoxClear.bind(this)}
+                    onClick={this.onChatBoxClear}
                     disabled={this.state.isChatDisabled}>清除记录</Button>
             </Space.Compact>
         )
@@ -149,14 +149,14 @@ export class QuestionTest extends React.Component {
         })
     }
 
-    onChatBoxSubmit() {
+    onChatBoxSubmit = () => {
         this.ChatWindoRef.current.RefreshDataSource(this.state.chatid);
     }
 
-    onChatBoxClear() {
+    onChatBoxClear = () => {
         this.setState({
             chatid: uuid()
-        }).then(() => {
+        }, () => {
             this.ChatWindoRef.current.RefreshDataSource(this.state.chatid);
         });
 
@@ -166,7 +166,7 @@ export class QuestionTest extends React.Component {
         return (
             <div>
                 <div style={{ marginTop: 16, marginBottom: 16 }}>
-                    <ChatBox chatid={this.state.chatid} onSubmit={this.onChatBoxSubmit.bind(this)} onClear={this.onChatBoxClear.bind(this)} />
+                    <ChatBox chatid={this.state.chatid} onSubmit={this.onChatBoxSubmit} onClear={this.onChatBoxClear} />
                 </div>
                 <div>
                     <ChatWindow ref={this.ChatWindoRef} chatid={this.state.chatid} />

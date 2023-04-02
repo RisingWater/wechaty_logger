@@ -1,5 +1,6 @@
 import { Configuration, OpenAIApi } from "openai";
 import SysConfigControl from "../db/SysConfigControl.js"
+import LogControl from "./LogUtils.js";
 import request from "request";
 
 const configuration = new Configuration({
@@ -21,9 +22,9 @@ function ShowBalance() {
 
     request.get(balance_url, options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-            console.log(body);
+            LogControl.Info("OpenAPI billing " + JSON.stringify(body, null, 4));
         } else {
-            console.log(error);
+            LogControl.Error("OpenAPI billing failed" + JSON.stringify(error, null, 4));
         }
     });
 }
@@ -35,6 +36,8 @@ class AIInterface {
             message: ""
         };
 
+        LogControl.Trace("ChatCompletion start:" + content);
+
         try {
             const completion = await openai.createChatCompletion({
                 model: "gpt-3.5-turbo",
@@ -44,18 +47,21 @@ class AIInterface {
             data.result = 0;
             data.message = completion.data.choices[0].message.content;
             var total_tokens = completion.data.usage.total_tokens;
-            console.log("use total_tokens: " + total_tokens);
+
+            LogControl.Info("ChatCompletion success use " + total_tokens + "tokens");
             ShowBalance();
         } catch (error) {
-            console.log(error);
+            LogControl.Error("ChatCompletion catch error " +  JSON.stringify(error, null, 4));
             if (error.response) {
                 data.result = error.response.status;
-                data.message = error.response.data;
+                data.message = error.response.data.error.message;
             } else {
                 data.result = -1;
                 data.message = "other error!";
             }
         }
+
+        LogControl.Trace("ChatCompletion result:" + JSON.stringify(data, null, 4));
 
         return data;
     }
@@ -66,6 +72,8 @@ class AIInterface {
             message: ""
         };
 
+        LogControl.Trace("Embedding start:" + content);
+
         try {
             const embedded = await openai.createEmbedding({
                 input: content,
@@ -74,21 +82,25 @@ class AIInterface {
 
             if (embedded.data.data.length) {
                 data.message = embedded.data.data[0].embedding;
+
+                var total_tokens = embedded.data.usage.total_tokens;
+                LogControl.Info("Embedding success use " + total_tokens + "tokens");
             } else {
                 data.result = -1;
                 data.message = "Question not embedded properly";
             }
         } catch (error) {
+            LogControl.Error("Embedding catch error " +  JSON.stringify(error, null, 4));
             if (error.response) {
                 data.result = error.response.status;
-                data.message = error.response.data;
+                data.message = error.response.data.error.message;
             } else {
                 data.result = -1;
                 data.message = "other error!";
             }
         }
 
-        console.log(data);
+        LogControl.Info("Embedding result:" + JSON.stringify(data, null, 4));
 
         return data;
     }
