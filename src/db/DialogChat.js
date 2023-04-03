@@ -10,15 +10,15 @@ class DialogChat {
         const dateString = new Date().toLocaleString();
 
         var chat = DBController.LoadAIChatDB(chatid);
-        const newChat = [...chat, { name: 'You', role: 0, content: input, time: dateString }];
+        const newChat = [...chat, { name: 'You', role: 0, content: input, time: dateString, refs: [] }];
         DBController.SaveAIChatDB(chatid, newChat);
     }
 
-    static AddAIChat = function (chatid, input) {
+    static AddAIChat = function (chatid, input, refs) {
         const dateString = new Date().toLocaleString();
 
         var chat = DBController.LoadAIChatDB(chatid);
-        const newChat = [...chat, { name: 'Chatgpt', role: 1, content: input, time: dateString }];
+        const newChat = [...chat, { name: 'Chatgpt', role: 1, content: input, time: dateString, refs: refs }];
         DBController.SaveAIChatDB(chatid, newChat);
     }
 

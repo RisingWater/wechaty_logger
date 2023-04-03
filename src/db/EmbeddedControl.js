@@ -96,7 +96,8 @@ class EmbeddedControl {
             var currentEmbedding = element.embedding;
     
             items.push({
-                fragment: element.content,
+                id:element.id,
+                content: element.content,
                 score: cosineSimilarity(questionEmbedding, currentEmbedding),
             });
         });
@@ -105,7 +106,13 @@ class EmbeddedControl {
             return b.score - a.score;
         });
     
-        return items.slice(0, count).map((item) => item.fragment);
+        return items.filter((element)=>{
+            if (element.score > 0.8) {
+                return true;
+            } else {
+                return false;
+            }
+        }).slice(0, count);
     };
 }
 

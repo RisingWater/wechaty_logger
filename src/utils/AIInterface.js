@@ -3,20 +3,13 @@ import SysConfigControl from "../db/SysConfigControl.js"
 import LogControl from "./LogUtils.js";
 import request from "request";
 
-const configuration = new Configuration({
-    organization: SysConfigControl.get().orgid,
-    apiKey: SysConfigControl.get().apikey,
-});
-
-const request_headers = {
-    "Authorization": "Bearer " + SysConfigControl.get().apikey,
-    "OpenAI-Organization": SysConfigControl.get().orgid,
-    "Content-Type": "application/json"
-};
-
-const openai = new OpenAIApi(configuration);
-
 function ShowBalance() {
+    var request_headers = {
+        "Authorization": "Bearer " + SysConfigControl.get().apikey,
+        "OpenAI-Organization": SysConfigControl.get().orgid,
+        "Content-Type": "application/json"
+    };
+
     var balance_url = "https://api.openai.com/dashboard/billing/credit_grants"
     const options = { headers: request_headers };
 
@@ -24,13 +17,20 @@ function ShowBalance() {
         if (!error && response.statusCode == 200) {
             LogControl.Info("OpenAPI billing " + JSON.stringify(body, null, 4));
         } else {
-            LogControl.Error("OpenAPI billing failed" + JSON.stringify(error, null, 4));
+            LogControl.Error("OpenAPI billing failed " + JSON.stringify(error, null, 4));
         }
     });
 }
 
 class AIInterface {
     static ChatCompletion = async function (content) {
+        var configuration = new Configuration({
+            organization: SysConfigControl.get().orgid,
+            apiKey: SysConfigControl.get().apikey,
+        });
+        
+        var openai = new OpenAIApi(configuration);
+
         var data = {
             result: 0,
             message: ""
@@ -48,7 +48,7 @@ class AIInterface {
             data.message = completion.data.choices[0].message.content;
             var total_tokens = completion.data.usage.total_tokens;
 
-            LogControl.Info("ChatCompletion success use " + total_tokens + "tokens");
+            LogControl.Info("ChatCompletion success use " + total_tokens + " tokens");
             ShowBalance();
         } catch (error) {
             LogControl.Error("ChatCompletion catch error " +  JSON.stringify(error, null, 4));
@@ -67,6 +67,13 @@ class AIInterface {
     }
 
     static Embedding = async function (content) {
+        var configuration = new Configuration({
+            organization: SysConfigControl.get().orgid,
+            apiKey: SysConfigControl.get().apikey,
+        });
+        
+        var openai = new OpenAIApi(configuration);
+        
         var data = {
             result: 0,
             message: ""
@@ -84,7 +91,7 @@ class AIInterface {
                 data.message = embedded.data.data[0].embedding;
 
                 var total_tokens = embedded.data.usage.total_tokens;
-                LogControl.Info("Embedding success use " + total_tokens + "tokens");
+                LogControl.Info("Embedding success use " + total_tokens + " tokens");
             } else {
                 data.result = -1;
                 data.message = "Question not embedded properly";
@@ -99,8 +106,6 @@ class AIInterface {
                 data.message = "other error!";
             }
         }
-
-        LogControl.Info("Embedding result:" + JSON.stringify(data, null, 4));
 
         return data;
     }

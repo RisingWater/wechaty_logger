@@ -99,21 +99,23 @@ class ConversationControl {
     }
 
     static ProcessQuestion = async function (chatid, input) {
-        var allchat = RecordChat.LoadAllChat(chatid);
+        var allchat = DialogChat.ListChat(chatid);
+        var refs = [];
         var data = {
             result: -1,
             message: ""
         };
 
-        LogControl.Trace("ProcessQuestion allchat count: " + allchat.length);
         DialogChat.AddUserChat(chatid, input);
 
-        var messages = await PromptCreator.CreateQuestionPrompt(allchat, input);
-        if (messages == null) {
+        var QuestionPrompt = await PromptCreator.CreateQuestionPrompt(allchat, input);
+        if (QuestionPrompt == null) {
             data.message = "CreateQuestionPrompt failed";
             LogControl.Error("ProcessQuestion CreateQuestionPrompt failed:" + JSON.stringify(data, null, 4));
         } else {
-            var completion_data = await AIInterface.ChatCompletion(messages);
+            LogControl.Info("ProcessQuestion QuestionPrompt:" + JSON.stringify(QuestionPrompt, null, 4));
+            refs = QuestionPrompt.refs;
+            var completion_data = await AIInterface.ChatCompletion(QuestionPrompt.QuestionPrompt);
             data.result = completion_data.result;
             data.message = completion_data.message;
         }
@@ -122,7 +124,7 @@ class ConversationControl {
             LogControl.Error("ProcessQuestion ChatCompletion failed:" + JSON.stringify(data, null, 4));
         }
         
-        DialogChat.AddAIChat(chatid, data.message)
+        DialogChat.AddAIChat(chatid, data.message, refs);
 
         return data;
     }
