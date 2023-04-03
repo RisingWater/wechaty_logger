@@ -57,7 +57,8 @@ class PromptCreator {
     static CreateQuestionPrompt = async function (history, content) {
         var prompt_result = {
             QuestionPrompt:"",
-            refs:[]
+            refs:[],
+            token:0
         }
 
         var result = await AIInterface.Embedding(content);
@@ -83,6 +84,7 @@ class PromptCreator {
 
         prompt += "问题如下 :\n" + content;
 
+        prompt_result.token = result.token;
         prompt_result.QuestionPrompt = GenDialogPrompt(history, prompt);
 
         return prompt_result;

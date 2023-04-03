@@ -14,10 +14,10 @@ function ShowBalance() {
     const options = { headers: request_headers };
 
     request.get(balance_url, options, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
+        if (error == null && response.statusCode == 200) {
             LogControl.Info("OpenAPI billing " + JSON.stringify(body, null, 4));
         } else {
-            LogControl.Error("OpenAPI billing failed " + JSON.stringify(error, null, 4));
+            LogControl.Error("OpenAPI billing failed code: " + response.statusCode + " error: " + JSON.stringify(error, null, 4));
         }
     });
 }
@@ -33,10 +33,9 @@ class AIInterface {
 
         var data = {
             result: 0,
-            message: ""
+            message: "",
+            token: 0
         };
-
-        LogControl.Trace("ChatCompletion start:" + content);
 
         try {
             const completion = await openai.createChatCompletion({
@@ -46,9 +45,8 @@ class AIInterface {
             });
             data.result = 0;
             data.message = completion.data.choices[0].message.content;
-            var total_tokens = completion.data.usage.total_tokens;
-
-            LogControl.Info("ChatCompletion success use " + total_tokens + " tokens");
+            data.token = completion.data.usage.total_tokens;
+            LogControl.Info("ChatCompletion success use " + data.token + " tokens");
             ShowBalance();
         } catch (error) {
             LogControl.Error("ChatCompletion catch error " +  JSON.stringify(error, null, 4));
@@ -76,7 +74,8 @@ class AIInterface {
         
         var data = {
             result: 0,
-            message: ""
+            message: "",
+            token: 0
         };
 
         LogControl.Trace("Embedding start:" + content);
@@ -89,9 +88,8 @@ class AIInterface {
 
             if (embedded.data.data.length) {
                 data.message = embedded.data.data[0].embedding;
-
-                var total_tokens = embedded.data.usage.total_tokens;
-                LogControl.Info("Embedding success use " + total_tokens + " tokens");
+                data.token = embedded.data.usage.total_tokens;
+                LogControl.Info("Embedding success use " + data.token + " tokens");
             } else {
                 data.result = -1;
                 data.message = "Question not embedded properly";

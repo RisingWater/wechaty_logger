@@ -88,7 +88,7 @@ class ConversationControl {
         var data = await AIInterface.ChatCompletion(messages);
 
         if (data.result == 0) {
-            DialogChat.AddAIChat(chatid, data.message)
+            DialogChat.AddAIChat(chatid, data.message, [], data.token)
         }
 
         return data;
@@ -106,6 +106,8 @@ class ConversationControl {
             message: ""
         };
 
+        var token = 0;
+
         DialogChat.AddUserChat(chatid, input);
 
         var QuestionPrompt = await PromptCreator.CreateQuestionPrompt(allchat, input);
@@ -113,18 +115,19 @@ class ConversationControl {
             data.message = "CreateQuestionPrompt failed";
             LogControl.Error("ProcessQuestion CreateQuestionPrompt failed:" + JSON.stringify(data, null, 4));
         } else {
-            LogControl.Info("ProcessQuestion QuestionPrompt:" + JSON.stringify(QuestionPrompt, null, 4));
+            token = QuestionPrompt.token;
             refs = QuestionPrompt.refs;
             var completion_data = await AIInterface.ChatCompletion(QuestionPrompt.QuestionPrompt);
             data.result = completion_data.result;
             data.message = completion_data.message;
+            token += completion_data.token;
         }
         
         if (data.result != 0) {
             LogControl.Error("ProcessQuestion ChatCompletion failed:" + JSON.stringify(data, null, 4));
         }
         
-        DialogChat.AddAIChat(chatid, data.message, refs);
+        DialogChat.AddAIChat(chatid, data.message, refs, token);
 
         return data;
     }
