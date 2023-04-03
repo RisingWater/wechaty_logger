@@ -83,6 +83,8 @@ class LogControl {
             };
         })
 
+        loglist.reverse();
+
         return loglist;
     }
 }

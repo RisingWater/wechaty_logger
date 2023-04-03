@@ -136,7 +136,6 @@ class RootContext extends React.Component {
 
     onMenuSelectChange = (object) => {
         var state = { menuSelectedkey: object.key };
-        console.log(state);
         this.setState(state);
     }
 
@@ -144,7 +143,7 @@ class RootContext extends React.Component {
         if (this.state.menuSelectedkey == "nahida") {
             return (<KnowledgeList />);
         } else if (this.state.menuSelectedkey == "question") {
-            return (<QuestionTest />);
+            return (<QuestionTest contentHeight={this.state.ContextHeight}/>);
         } else if (this.state.menuSelectedkey == "changepassword") {
             return (<ChangePassword />);
         } else if (this.state.menuSelectedkey == "sysconfig") {

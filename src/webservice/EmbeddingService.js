@@ -5,7 +5,7 @@ class EmbeddingService {
     static list = function (req, res) {
         var result = { 
             result : 0,
-            data : EmbeddedControl.ListEmbeddedInfo()
+            data : EmbeddedControl.ListEmbeddedInfo().reverse()
         };
     
         res.send(result);
@@ -40,6 +40,21 @@ class EmbeddingService {
             result : 0
         };
     
+        res.send(result);
+    }
+
+    static get = function (req, res) {
+        var result = { 
+            result : -1,
+            data : null
+        };
+
+        var embedded = EmbeddedControl.FindEmbeddedById(req.body.id);
+
+        if (embedded != null) {
+            result.data = embedded;
+        }
+
         res.send(result);
     }
 }

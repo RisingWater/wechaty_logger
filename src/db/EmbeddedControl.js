@@ -54,8 +54,10 @@ class EmbeddedControl {
                 element.content = content;
                 element.embedding = Embedded;
                 element.embeddingTime = new Date().toLocaleString()
+                return true;
             }
         })
+        DBController.SaveEmbeddedDB(list);
     }
 
     static FindEmbedded = function (content) {
@@ -70,6 +72,19 @@ class EmbeddedControl {
         })
 
         return found;
+    }
+
+    static FindEmbeddedById = function (id) {
+        var embedded = null;
+        var list = DBController.LoadEmbeddedDB();
+        list.some((element) => {
+            if (element.id == id) {
+                embedded = element;
+                return true;
+            }
+        })
+
+        return embedded;
     }
 
     static AddEmbedded = function (content, Embedded, summary) {

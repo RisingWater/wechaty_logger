@@ -34,7 +34,7 @@ export class LogList extends React.Component {
                     title: '日志等级',
                     dataIndex: 'level',
                     key: 'level',
-                    width: 50
+                    width: 75
                 },
                 {
                     title: '生成时间',
@@ -64,7 +64,6 @@ export class LogList extends React.Component {
     RefreshData() {
         this.setState({ loading: true });
         var json = { "dateString": this.state.dateString, "loglevel": this.state.loglevel };
-        console.log(json);
         $.ajax({
             type: "post",
             url: "log/get",
@@ -104,7 +103,6 @@ export class LogList extends React.Component {
     };
 
     onLevelChange = (value) => {
-        console.log("level:" + value);
         this.setState({
             loglevel: value
         }, () => {

@@ -4,7 +4,6 @@ import LogControl from "../utils/LogUtils.js";
 
 class ChatService {
     static list = function(req, res) {
-        LogControl.Trace("ChatService list chatid " + req.body.chatid);
         var chatlist = DialogChat.ListChat(req.body.chatid);
         LogControl.Trace("ChatService list return " + chatlist.length + " chats");
         res.send(chatlist);

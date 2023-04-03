@@ -11,7 +11,9 @@ import {
     Typography,
     Space,
     Modal,
-    Form
+    Form,
+    Upload,
+    message
 } from 'antd';
 
 import {
@@ -20,7 +22,6 @@ import {
     PlusCircleOutlined,
     FileAddOutlined
 } from '@ant-design/icons'
-
 
 export class KnowledgeList extends React.Component {
     constructor(props) {
@@ -148,7 +149,7 @@ export class KnowledgeList extends React.Component {
     };
 
     AddData(data) {
-        var json = { "id" : "", "content": data.content, "summary": data.summary };
+        var json = { "id": "", "content": data.content, "summary": data.summary };
         this.setState({ loading: true });
         $.ajax({
             type: "post",
@@ -164,7 +165,8 @@ export class KnowledgeList extends React.Component {
     }
 
     EditData(data) {
-        var json = { "id" : data.id, "content": data.content, "summary": data.summary };
+        console.log(data);
+        var json = { "id": data.id, "content": data.content, "summary": data.summary };
         this.setState({ loading: true });
         $.ajax({
             type: "post",
@@ -215,6 +217,7 @@ export class KnowledgeList extends React.Component {
     handleOk = () => {
         this.FormRef.current.validateFields()
             .then((values) => {
+                console.log(values);
                 this.UpdateData(values);
 
                 this.setState({
@@ -243,17 +246,31 @@ export class KnowledgeList extends React.Component {
         });
     };
 
+    UploadEvent = (info) => {
+        if (info.file.status !== 'uploading') {
+            console.log(info.file, info.fileList);
+        }
+        if (info.file.status === 'done') {
+            message.success(`文件 ${info.file.name} 上传成功`);
+        } else if (info.file.status === 'error') {
+            message.error(`文件 ${info.file.name} 上传失败`);
+        }
+    }
+
     render() {
         return (
             <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, marginBottom: 16 }}>
-                    <Space>
+                    <Space align='start'>
                         <Button type="primary" icon={<PlusCircleOutlined />} onClick={this.ShowAddDialog} style={{ marginRight: 8 }}>添加知识</Button>
-                        <Popconfirm title="敬请期待"
-                            description="功能尚未实现"
-                            okText="确认">
-                            <Button icon={<FileAddOutlined />} style={{ marginRight: 8 }}>导入文件</Button>
-                        </Popconfirm>
+                        <Upload name="file"
+                            accept='.txt'
+                            action='/file/upload'
+                            onChange= {this.UploadEvent}
+                            showUploadList={false}
+                            maxCount={1}>
+                            <Button icon={<FileAddOutlined />}>导入文件</Button>
+                        </Upload>
                     </Space>
                     <div>
                         <Input.Search placeholder="搜索知识" onSearch={this.onSearch} style={{ width: 400 }} allowClear enterButton />

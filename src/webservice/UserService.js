@@ -12,8 +12,6 @@ class UserService {
             isAdmin: false
         }
         
-        LogControl.Trace("UserService check userid " + req.body.userid);
-
         user = UserControl.find_byuserid(req.body.userid);
 
         if (user != null) {
@@ -21,8 +19,6 @@ class UserService {
             result.username = user.username;
             result.isAdmin = user.isAdmin;
         }
-
-        LogControl.Trace("UserService check done " + JSON.stringify(result, null, 4));
 
         res.send(result);
     }
