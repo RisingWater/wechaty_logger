@@ -122,7 +122,7 @@ class EmbeddedControl {
         });
     
         return items.filter((element)=>{
-            if (element.score > 0.8) {
+            if (element.score > 0.76) {
                 return true;
             } else {
                 return false;

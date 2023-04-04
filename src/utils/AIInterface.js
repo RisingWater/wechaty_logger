@@ -47,7 +47,7 @@ class AIInterface {
             data.message = completion.data.choices[0].message.content;
             data.token = completion.data.usage.total_tokens;
             LogControl.Info("ChatCompletion success use " + data.token + " tokens");
-            ShowBalance();
+            //ShowBalance();
         } catch (error) {
             LogControl.Error("ChatCompletion catch error " +  JSON.stringify(error, null, 4));
             if (error.response) {

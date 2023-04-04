@@ -5,6 +5,7 @@ import UserService from "./webservice/UserService.js"
 import SysConfigService from "./webservice/SysConfigService.js"
 import ChatService from "./webservice/ChatService.js"
 import LogService from './webservice/LogService.js';
+import UploadService from './webservice/uploadService.js';
 
 import LogControl from './utils/LogUtils.js';
 import SysConfigControl from "./db/SysConfigControl.js"
@@ -35,6 +36,8 @@ app.post('/chat/list', ChatService.list);
 app.post('/chat/chatWithKnowledge', ChatService.chatWithKnowledge);
 
 app.post('/log/get', LogService.get);
+
+app.post('/file/upload', UploadService.uploadInfo(), UploadService.upload);
 
 app.listen(SysConfigControl.get().port, () => {
     LogControl.Info('Server started on port ' + SysConfigControl.get().port);

@@ -111,7 +111,7 @@ class ChatWindow extends React.Component {
         if (item.role == 0) {
             return (
                 <div style={{ width: "100%", textAlign: "right" }}>
-                    <Space align="start" style={{ marginRight: "30px" }}>
+                    <Space align="start" style={{ marginRight: "30px", marginLeft: "100px"  }}>
                         <Card style={{ background: "#1AAD19" }} size="small">
                             <Space direction="vertical" size="small">
                                 {
@@ -131,9 +131,9 @@ class ChatWindow extends React.Component {
         } else {
             return (
                 <div style={{ width: "100%", textAlign: "left" }}>
-                    <Space align="start" style={{ marginLeft: "30px" }}>
+                    <Space align="start" style={{ marginLeft: "30px", marginRight: "100px" }}>
                         <Avatar src={this.state.AIAvatar} />
-                        <Card style={{ background: "#F2F2F2", maxWidth: "60%" }} size="small">
+                        <Card style={{ background: "#F2F2F2"}} size="small">
                             <Space direction="vertical" size="small">
                                 {
                                     item.content.split("\n").map((line) => {
