@@ -14,6 +14,52 @@ class EmbeddedControl {
         return DBController.LoadEmbeddedDB();
     }
 
+    static ListEmbeddedInfo = function () {
+        var Infolist = [];
+        var list = DBController.LoadEmbeddedDB();
+        list.some((element) => {
+            var info = {
+                id: element.id,
+                embeddingTime : element.embeddingTime,
+                summary: element.summary,
+                content: element.content,
+            }
+
+            Infolist.push(info);
+        })
+
+        return Infolist;
+    }
+
+    static DeleteEmbedded = function (id) {
+        var list = DBController.LoadEmbeddedDB();
+        var newlist = list.filter((element) => {
+            if (element.id != id) {
+                return true;
+            }
+            return false;
+        })
+
+        DBController.SaveEmbeddedDB(newlist);
+        return;
+    }
+
+    static UpdateEmbedded = function (id, summary, content, Embedded) {
+        var list = DBController.LoadEmbeddedDB();
+        list.some((element) => {
+            if (element.id == id) {
+                var md5sum = md5(content);
+                element.summary = summary;
+                element.md5sum = md5sum;
+                element.content = content;
+                element.embedding = Embedded;
+                element.embeddingTime = new Date().toLocaleString()
+                return true;
+            }
+        })
+        DBController.SaveEmbeddedDB(list);
+    }
+
     static FindEmbedded = function (content) {
         var found = false;
         var list = DBController.LoadEmbeddedDB();
@@ -28,14 +74,27 @@ class EmbeddedControl {
         return found;
     }
 
+    static FindEmbeddedById = function (id) {
+        var embedded = null;
+        var list = DBController.LoadEmbeddedDB();
+        list.some((element) => {
+            if (element.id == id) {
+                embedded = element;
+                return true;
+            }
+        })
+
+        return embedded;
+    }
+
     static AddEmbedded = function (content, Embedded, summary) {
         var list = DBController.LoadEmbeddedDB();
         var embedded = {
             id: uuid(),
+            embeddingTime : new Date().toLocaleString(),
             summary: summary,
             embedding: Embedded,
             content: content,
-            created: new Date().getTime(),
             md5sum: md5(content)
         };
         list.push(embedded);
@@ -52,7 +111,8 @@ class EmbeddedControl {
             var currentEmbedding = element.embedding;
     
             items.push({
-                fragment: element.content,
+                id:element.id,
+                content: element.content,
                 score: cosineSimilarity(questionEmbedding, currentEmbedding),
             });
         });
@@ -61,7 +121,13 @@ class EmbeddedControl {
             return b.score - a.score;
         });
     
-        return items.slice(0, count).map((item) => item.fragment);
+        return items.filter((element)=>{
+            if (element.score > 0.76) {
+                return true;
+            } else {
+                return false;
+            }
+        }).slice(0, count);
     };
 }
 

@@ -1,10 +1,11 @@
 import xml2js from "xml2js"
+import LogControl from "./LogUtils.js";
 
 class RecordHelper {
     static RecordChatLog = function(chatlog, callback) {
         xml2js.parseString(chatlog, (err, result) => {
             if (err == null) {
-                console.log(result.msg.appmsg.some((element) => {
+                result.msg.appmsg.some((element) => {
                     element.recorditem.some((record) => {
                         xml2js.parseString(record, (err, record2) => {
                             if (err == null) {
@@ -15,12 +16,14 @@ class RecordHelper {
                                         }
                                     })
                                 })
+                            } else {
+                                LogControl.Error("RecordChatLog failed " + JSON.stringify(err, null, 4));
                             }
                         })
                     })
-                }));
+                });
             } else {
-                console.log(error);
+                LogControl.Error("RecordChatLog failed " + JSON.stringify(err, null, 4));
             }
         });
     }

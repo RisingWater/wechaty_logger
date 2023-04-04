@@ -5,6 +5,7 @@ import AIInterface from "../utils/AIInterface.js"
 import PromptCreator from "../utils/PromptCreator.js";
 import RecordHelper from "../utils/RecordHelper.js";
 import EmbeddedControl from "./EmbeddedControl.js"
+import LogControl from "../utils/LogUtils.js";
 
 class ConversationControl {
     static FindConversation = function (chatid) {
@@ -69,7 +70,7 @@ class ConversationControl {
         if (data.result == 0) {
             var summary = RecordChat.SaveSummary(chatid, allchat, data.message, topic);
 
-            AIInterface.Embedding(data.message).then((result)=>{
+            AIInterface.Embedding(data.message).then((result) => {
                 if (result.result == 0) {
                     var md5 = EmbeddedControl.AddEmbedded(Fragment, result.message);
                     console.log("Fragment[" + chatid + "] Embedding finish, md5: " + md5);
@@ -87,7 +88,7 @@ class ConversationControl {
         var data = await AIInterface.ChatCompletion(messages);
 
         if (data.result == 0) {
-            DialogChat.AddAIChat(chatid, data.message)
+            DialogChat.AddAIChat(chatid, data.message, [], data.token)
         }
 
         return data;
@@ -98,17 +99,35 @@ class ConversationControl {
     }
 
     static ProcessQuestion = async function (chatid, input) {
-        var allchat = RecordChat.LoadAllChat(chatid);
-        var messages = await PromptCreator.CreateQuestionPrompt(allchat, input);
-        if (messages == null) {
-            return JSON.parse("{ result:-1, message:\"CreateQuestionPrompt failed\"}");
-        }
-        DialogChat.AddUserChat(chatid, input);
-        var data = await AIInterface.ChatCompletion(messages);
+        var allchat = DialogChat.ListChat(chatid);
+        var refs = [];
+        var data = {
+            result: -1,
+            message: ""
+        };
 
-        if (data.result == 0) {
-            DialogChat.AddAIChat(chatid, data.message)
+        var token = 0;
+
+        DialogChat.AddUserChat(chatid, input);
+
+        var QuestionPrompt = await PromptCreator.CreateQuestionPrompt(allchat, input);
+        if (QuestionPrompt == null) {
+            data.message = "CreateQuestionPrompt failed";
+            LogControl.Error("ProcessQuestion CreateQuestionPrompt failed:" + JSON.stringify(data, null, 4));
+        } else {
+            token = QuestionPrompt.token;
+            refs = QuestionPrompt.refs;
+            var completion_data = await AIInterface.ChatCompletion(QuestionPrompt.QuestionPrompt);
+            data.result = completion_data.result;
+            data.message = completion_data.message;
+            token += completion_data.token;
         }
+        
+        if (data.result != 0) {
+            LogControl.Error("ProcessQuestion ChatCompletion failed:" + JSON.stringify(data, null, 4));
+        }
+        
+        DialogChat.AddAIChat(chatid, data.message, refs, token);
 
         return data;
     }
