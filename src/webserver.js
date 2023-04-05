@@ -24,6 +24,7 @@ app.post('/embedded/del', EmbeddingService.del)
 app.post('/embedded/add', EmbeddingService.add)
 app.post('/embedded/edit', EmbeddingService.edit)
 app.post('/embedded/get', EmbeddingService.get)
+app.get('/embedded/waitingCount', EmbeddingService.waitingCount)
 
 app.post('/user/check', UserService.check);
 app.post('/user/login', UserService.login);

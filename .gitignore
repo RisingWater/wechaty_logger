@@ -3,3 +3,4 @@
 /.vscode
 /.env
 /websrc/node_modules
+/test.txt

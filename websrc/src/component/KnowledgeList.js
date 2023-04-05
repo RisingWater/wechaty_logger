@@ -6,7 +6,7 @@ import {
     Button,
     Popconfirm,
     Input,
-    Pagination,
+    Spin,
     Collapse,
     Typography,
     Space,
@@ -39,7 +39,8 @@ export class KnowledgeList extends React.Component {
                 summary: "",
                 content: "",
             },
-            loading: true
+            loading: true,
+            waitingCount: 0
         };
 
         this.FormRef = React.createRef();
@@ -57,12 +58,6 @@ export class KnowledgeList extends React.Component {
             dataSource: this.filterData(value, this.state.orgDataSource)
         });
     };
-
-    getPagination() {
-        return (
-            <Pagination size="small" defaultPageSize="30" showQuickJumper />
-        )
-    }
 
     getColumns() {
         return (
@@ -181,16 +176,39 @@ export class KnowledgeList extends React.Component {
         });
     }
 
+    GetWaitingCount() {
+        $.ajax({
+            type: "get",
+            url: "embedded/waitingCount",
+            contentType: "application/json",
+            success: (data, status) => {
+                if (status == "success") {
+                    this.setState({
+                        waitingCount: data.result
+                    });
+                }
+            }
+        });
+    }
+
     UpdateData(data) {
         if (this.state.isEdit) {
             this.EditData(data);
         } else {
             this.AddData(data);
         }
+        this.RefreshData();
+    }
+
+    onTimer = () => {
+        this.GetWaitingCount();
+        this.RefreshData();
     }
 
     componentDidMount() {
+        this.GetWaitingCount();
         this.RefreshData();
+        setInterval(this.onTimer, 10000);
     }
 
     ShowAddDialog = (e) => {
@@ -255,6 +273,24 @@ export class KnowledgeList extends React.Component {
         } else if (info.file.status === 'error') {
             message.error(`文件 ${info.file.name} 上传失败`);
         }
+
+        this.GetWaitingCount();
+        this.RefreshData();
+    }
+
+    getLoading() {
+        if (this.state.waitingCount != 0) {
+            var count = this.state.waitingCount;
+            return (
+                <Space align="center">
+                    <Spin size="small"/>
+                    <p>{"当前还有" + count + "个文本段落正在训练, 预计生成" + count * 3 + "到" + count * 10 + "个知识片段"}</p>
+                </Space>
+            )
+        } else {
+            return (<div />)
+        }
+
     }
 
     render() {
@@ -266,7 +302,7 @@ export class KnowledgeList extends React.Component {
                         <Upload name="file"
                             accept='.txt'
                             action='/file/upload'
-                            onChange= {this.UploadEvent}
+                            onChange={this.UploadEvent}
                             showUploadList={false}
                             maxCount={1}>
                             <Button icon={<FileAddOutlined />}>导入文件</Button>
@@ -276,11 +312,12 @@ export class KnowledgeList extends React.Component {
                         <Input.Search placeholder="搜索知识" onSearch={this.onSearch} style={{ width: 400 }} allowClear enterButton />
                     </div>
                 </div>
+                {this.getLoading()}
                 <Table
                     size="middle"
                     columns={this.getColumns()}
                     dataSource={this.state.dataSource}
-                    pagination={{ size: "default", position: "both", defaultPageSize: 20, showQuickJumper: true }}
+                    pagination={{ size: "default", position: ["topRight"], defaultPageSize: 20, showQuickJumper: true }}
                     loading={this.state.loading}>
                 </Table>
                 <Modal

@@ -143,8 +143,7 @@ class ChatWindow extends React.Component {
                                     })
                                 }
                                 <Collapse ghost expandIconPosition='end'>
-                                    <Collapse.Panel header={"详细信息"} key="1">
-                                        <p>{"此回答消耗Token " + item.token_used + "个" + (item.refs.length != 0 ? ("，并参考下列" + item.refs.length + "份资料") : "")}</p>
+                                    <Collapse.Panel header={"此回答消耗Token " + item.token_used + "个" + (item.refs.length != 0 ? ("，并参考下列" + item.refs.length + "份资料") : "")} key="1">
                                         {this.getRefs(item)}
                                     </Collapse.Panel>
                                 </Collapse>

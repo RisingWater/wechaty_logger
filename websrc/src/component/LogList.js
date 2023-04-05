@@ -146,7 +146,7 @@ export class LogList extends React.Component {
                     size="middle"
                     columns={this.getColumns()}
                     dataSource={this.state.dataSource}
-                    pagination={{ size: "default", position: "both", defaultPageSize: 20, showQuickJumper: true }}
+                    pagination={{ size: "default", position:["topRight"] , defaultPageSize: 20, showQuickJumper: true }}
                     loading={this.state.loading}>
                 </Table>
             </div>

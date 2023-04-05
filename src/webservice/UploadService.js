@@ -20,9 +20,13 @@ class UploadService {
         var dstfile = process.cwd() + "/" + des_file;
         fs.readFile(srcfile, function (err, data) {
             fs.writeFile(dstfile, data, function (err) {
-                FileEmbedding.ProcessFile(dstfile).then((result) => {
-                    res.send(result);
-                });
+                FileEmbedding.ProcessFile(dstfile);
+
+                var result = {
+                    result: 0,
+                    messages: ""
+                }
+                res.send(result);
             });
         });
 

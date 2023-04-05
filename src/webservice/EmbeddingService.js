@@ -1,5 +1,6 @@
 import EmbeddedControl from "../db/EmbeddedControl.js";
 import AIInterface from "../utils/AIInterface.js";
+import FileEmbedding from "../utils/FileEmbedding.js";
 
 class EmbeddingService {
     static list = function (req, res) {
@@ -56,6 +57,14 @@ class EmbeddingService {
         }
 
         res.send(result);
+    }
+
+    static waitingCount = function (req, res) {
+        var result = { 
+            result : FileEmbedding.GetWaitingList()
+        };
+        
+        res.send(result); 
     }
 }
 

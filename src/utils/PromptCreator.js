@@ -54,6 +54,19 @@ class PromptCreator {
         return all_prompt;
     }
 
+    static CreateQASplitPrompt = async function(context) {
+        return [
+            {
+                "role" : "system",
+                "content" : "下面是一段长文本, 请从中提取出15至30个问题和答案,并按以下格式返回: Q1:\nA1:\nQ2:\nA2:\n"
+            },
+            {
+                "role": "user",
+                "content": context
+            }
+        ];
+    }
+
     static CreateQuestionPrompt = async function (history, content) {
         var prompt_result = {
             QuestionPrompt:"",
