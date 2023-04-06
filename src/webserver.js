@@ -35,6 +35,7 @@ app.post('/sys/config', SysConfigService.config);
 
 app.post('/chat/list', ChatService.list);
 app.post('/chat/chatWithKnowledge', ChatService.chatWithKnowledge);
+app.post('/chat/chatDirectly', ChatService.chatDirectly);
 
 app.post('/log/get', LogService.get);
 

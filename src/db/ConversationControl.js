@@ -83,8 +83,9 @@ class ConversationControl {
 
     static ProcessDialog = async function (chatid, input) {
         var history = DialogChat.ListChat(chatid);
-        var messages = await PromptCreator.CreateDialogPrompt(history, input);
         DialogChat.AddUserChat(chatid, input);
+        
+        var messages = await PromptCreator.CreateDialogPrompt(history, input);
         var data = await AIInterface.ChatCompletion(messages);
 
         if (data.result == 0) {
